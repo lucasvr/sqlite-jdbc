@@ -99,6 +99,16 @@ public final class NativeDB extends DB {
     @Override
     public synchronized native int enable_load_extension(boolean enable);
 
+    /** @see org.sqlite.core.DB#load_extension(boolean) */
+    @Override
+    public synchronized int load_extension(String file, String proc) throws SQLException {
+        DriverManager.println(
+                "DriverManager [" + Thread.currentThread().getName() + "] [SQLite LOAD_EXT] " + file + " " + proc);
+        return load_extension_utf8(stringToUtf8ByteArray(file), stringToUtf8ByteArray(proc));
+    }
+
+    synchronized native int load_extension_utf8(byte[] fileUtf8, byte[] procUtf8) throws SQLException;
+
     /** @see org.sqlite.core.DB#interrupt() */
     @Override
     public native void interrupt();

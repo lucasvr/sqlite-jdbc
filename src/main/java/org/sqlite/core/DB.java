@@ -176,6 +176,18 @@ public abstract class DB implements Codes {
     public abstract int enable_load_extension(boolean enable) throws SQLException;
 
     /**
+     * Loads a SQLite extension.
+     *
+     * @param file Name of the extension file to load.
+     * @param proc Name of the entry point, or null to use the default entry point.
+     * @return <a href="http://www.sqlite.org/c3ref/c_abort.html">Result Codes</a>
+     * @throws SQLException
+     * @see <a
+     *     href="http://www.sqlite.org/c3ref/load_extension.html">http://www.sqlite.org/c3ref/load_extension.html</a>
+     */
+    public abstract int load_extension(String file, String proc) throws SQLException;
+
+    /**
      * Executes an SQL statement using the process of compiling, evaluating, and destroying the
      * prepared statement object.
      *

@@ -528,6 +528,43 @@ JNIEXPORT jint JNICALL Java_org_sqlite_core_NativeDB_enable_1load_1extension(
     return sqlite3_enable_load_extension(db, enable ? 1 : 0);
 }
 
+JNIEXPORT jint JNICALL Java_org_sqlite_core_NativeDB_load_1extension_1utf8(
+        JNIEnv *env, jobject this, jbyteArray file, jbyteArray proc)
+{
+    sqlite3 *db = gethandle(env, this);
+    if (!db)
+    {
+        throwex_db_closed(env);
+        return SQLITE_MISUSE;
+    }
+
+    char *file_bytes = NULL;
+    char *proc_bytes = NULL;
+    char *error_msg  = NULL;
+    int ret;
+
+    utf8JavaByteArrayToUtf8Bytes(env, file, &file_bytes, NULL);
+    if (!file_bytes) return SQLITE_NOMEM;
+
+    if (proc != NULL) {
+        utf8JavaByteArrayToUtf8Bytes(env, proc, &proc_bytes, NULL);
+        if (!proc_bytes) {
+            freeUtf8Bytes(file_bytes);
+            return SQLITE_NOMEM;
+        }
+    }
+
+    ret = sqlite3_load_extension(db, file_bytes, proc_bytes, &error_msg);
+    if (ret != SQLITE_OK) {
+        fprintf(stderr, "sqlite3_load_extension %s failed: %s\n", file_bytes, error_msg);
+        sqlite3_free(error_msg);
+    }
+
+    freeUtf8Bytes(file_bytes);
+    freeUtf8Bytes(proc_bytes);
+
+    return ret;
+}
 
 JNIEXPORT void JNICALL Java_org_sqlite_core_NativeDB__1open_1utf8(
         JNIEnv *env, jobject this, jbyteArray file, jint flags)
